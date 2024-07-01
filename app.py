@@ -3,6 +3,9 @@ import requests
 
 app = Flask(__name__)
 
+# Your OpenWeatherMap API key
+OPENWEATHER_API_KEY = '70c16e358990d72dc8e3e736eed857fc'
+
 @app.route('/api/hello', methods=['GET'])
 def hello():
     try:
@@ -14,7 +17,15 @@ def hello():
         location_data = location_response.json()
         
         city = location_data.get('city', 'your city')
-        temperature = 11  # For simplicity, we're using a constant value here
+        
+        # Use OpenWeatherMap API to get the current weather data
+        weather_response = requests.get(
+            f'http://api.openweathermap.org/data/2.5/weather',
+            params={'q': city, 'appid': OPENWEATHER_API_KEY, 'units': 'metric'}
+        )
+        weather_data = weather_response.json()
+        
+        temperature = weather_data['main']['temp'] if 'main' in weather_data else 'unknown'
         
         return jsonify({
             'client_ip': client_ip,
